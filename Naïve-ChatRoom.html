@@ -1,0 +1,146 @@
+<html>
+  <head>
+  	<meta charset="utf-8">
+    <title>Naïve-ChatRoom</title>
+    <script src='https://cdn.firebase.com/js/client/2.2.1/firebase.js'></script>
+    <script src='https://djangotarantino.github.io/jquery-1.11.1.min.js'></script>
+
+  </head>
+  <body>
+    <div style = "position:relative; font-size:60px; font-family:Courier New; width: 200px; height:550px; top:10px; left: 20%;">Naïve ChatRoom</div>
+    <div style = "position:absolute; font-size:30px; font-family:Courier New; width: 500px; bottom:10%; right: 8%;color:#6ff">Coneceting People.</div>
+    <div id="Layer1" style="position:fixed; left:0; top:0; width:100%; height:100%; filter:Alpha(Opacity=60); Opacity:0.6; z-index:-1">    
+    <img src="http://djangotarantino.github.io/345303.jpg" height="100%" width="100%"/> 
+  	<script>
+
+    var tagTop = Math.max(document.documentElement.scrollTop,document.body.scrollTop);
+    var sx = document.documentElement.clientWidth, sy = window.innerHeight || document.documentElement.clientHeight;
+    
+    //聊天窗口区域
+    var chatBox = document.createElement("div");
+    chatBox.style.cssText = "border:3px solid #999;overflow:left; position:absolute; background:white; left:"+(parseInt(document.body.offsetWidth) / 6)+"px; top:" + (document.documentElement.clientHeight/6 + tagTop) + "px; height:"+(sy*2/3)+"px; width:"+(sx*2/3)+"px; ";
+    document.body.appendChild(chatBox);
+    //聊天输入框
+    var inputBox = document.createElement("textarea");
+    inputBox.id = "inputBox";
+    inputBox.style.cssText = "word-break: normal; font:20px /25px Courier New;display:block; position:absolute; right:0; top:80%; width:80%; height:20%;";
+    inputBox.placeholder = "在此键入消息---Enter发送消息...";
+    chatBox.appendChild(inputBox);
+    //用户列表
+    var user_List = document.createElement("div");
+    user_List.id = "user_List";
+    user_List.style.cssText = "border-right:3px solid #999; height:100%; width:20%; font:20px /25px Courier New;display:block; position:absolute; left:0; top:0;";
+    chatBox.appendChild(user_List);
+      //用户列表标题
+      var user_List_title = document.createElement("div");
+      user_List_title.id = "user_List_title";
+      user_List_title.style.cssText = "text-align:center; height:7%; width:100%; border-bottom:3px solid #999; font:20px /25px STXihei;display:block; position:absolute; left:0; top:0;";
+      user_List_title.innerHTML = "用户列表";
+      user_List.appendChild(user_List_title);
+      //用户列表内容
+      var user_List_content = document.createElement("div");
+      user_List_content.id = "user_List_content";
+      user_List_content.style.cssText = "overflow-y:auto; height:92.2%; width:100%; border-bottom:3px solid #999; font:20px /25px Courier New;display:block; position:absolute; left:0; top:7.5%;";
+      user_List.appendChild(user_List_content);
+    //聊天内容
+    var chatMessage = document.createElement("div");
+    chatMessage.id = "chatMessage";
+    chatMessage.style.cssText = "word-wrap:break-word;  overflow-y:auto; border-bottom:3px solid #999; height:80%; width:79.8%; font:20px /25px Courier New;display:block; position:absolute; right:0; top:0;";
+    chatBox.appendChild(chatMessage);
+
+    //登陆界面遮罩
+    var loginboxOutside = document.createElement("div");
+     loginboxOutside.style.cssText = "width:111%; height:"+ document.documentElement.scrollHeight +"px; top:0; left:0; position:absolute; background:black; top:0; filter:Alpha(Opacity=95); Opacity:0.95;";
+     document.body.appendChild(loginboxOutside);
+
+    //登陆界面区域
+    var loginbox = document.createElement("div");
+    loginbox.style.cssText = "overflow:left; text-align:center; position:absolute; background:white; left:"+(parseInt(document.body.offsetWidth) / 3)+"px; top:" + (document.documentElement.clientHeight/3 + tagTop) + "px; height:"+(sy/3)+"px; width:"+(sx/3)+"px; "
+    document.body.appendChild(loginbox);
+
+    //登陆界面提示
+    var tagSlogan = document.createElement("div");
+    tagSlogan.style.cssText = "font:20px /25px Microsoft Yahei; overflow:left; text-align:center; position:absolute; left:39%; top:20%;";
+    tagSlogan.innerHTML = "请输入用户名";
+    loginbox.appendChild(tagSlogan); 
+
+    //登陆界面标签
+    var loginTag = document.createElement("div");
+    loginTag.style.cssText="font:40px /25px Courier New;display:block; position:absolute; left:35%; top:85%; color:#000;";
+    loginTag.innerHTML = "<b style='background:#DDD;filter:Alpha(Opacity=80);Opacity:0.8;cursor:pointer;'>&nbsp;Login&nbsp</b>";
+    loginbox.appendChild(loginTag);
+
+    //登陆界面输入框
+    var loginInput = document.createElement("input");
+    loginInput.id = "loginInput";
+    loginInput.style.cssText="placeholder:'username'; font:20px /25px Courier New;display:block; position:absolute; left:29%; top:45%;";
+    loginInput.placeholder = "Username";
+    loginbox.appendChild(loginInput);
+
+    //登陆事件响应
+    var f = function(){
+      var loginFlag = false;
+      if (($('#'+ loginInput.value)[0] == undefined)  && (loginInput.value.length != 0)) {
+        loginboxOutside.style.display = "none";
+        loginbox.style.display = "none";
+        loginFlag = true;
+        usernameList.push({username:loginInput.value});
+      }else if (loginInput.value.length == 0) {
+        alert("用户名不能为空！");
+      }else{
+        alert("用户名已经存在！");
+        loginInput.value = "";
+      }
+    }
+    loginTag.onclick = f;
+    $('#loginInput').keypress(function (e) {
+      if (e.keyCode == 13) {
+        f();
+      }
+    });
+
+    //用户列表
+    var usernameList = new Firebase('https://incandescent-inferno-5084.firebaseio.com/usernameList');
+    usernameList.on("child_added", function(snapshot) {
+      var uname = snapshot.val();
+      $('<div id="'+uname.username+'" />').text(uname.username).appendTo($('#user_List_content'));
+    });
+    window.onbeforeunload = function(){
+      usernameList.remove({username:loginInput.value});
+    };
+    
+  	var myDataRef = new Firebase('https://incandescent-inferno-5084.firebaseio.com/chatContent');
+    var curname;
+  	$('#inputBox').keypress(function (e) {
+      if (e.keyCode == 13) {
+        var name = loginInput.value;
+        var text = $('#inputBox').val();
+        myDataRef.push({name: name, text: text});
+        $('#inputBox').val('');
+        e.preventDefault();
+      }
+    });
+  	myDataRef.limitToLast(10).on('child_added', function(snapshot) {
+      var today = new Date();
+      var month = today.getMonth() + 1;
+      var day = today.getDate() + 1;
+      var hour = today.getHours(); 
+      var minutes = today.getMinutes(); 
+      var seconds =  today.getSeconds(); 
+      var message = snapshot.val();
+      var color = getRandomColor();
+      $('<div style="color:'+ color +';font-family:STXihei; font-size: 18px;"/>').text(message.name + ' ' + month + '/' + day + '--' + hour + ':' + minutes + ':' + seconds).appendTo($('#chatMessage'));
+      $('<div style="font-family:FangSong; font-size: 17px;"/>').text('-'+   message.text).appendTo($('#chatMessage'));
+      chatMessage.scrollTop = chatMessage.scrollHeight;
+    });
+
+
+    var getRandomColor = function () {
+      return '#' + (function(color) { 
+      return (color += '0123456789abcdef' [Math.floor(Math.random() * 16)]) 
+          && (color.length == 6) ? color: arguments.callee(color); //将''字符串传给color
+      })('');
+    }
+  	</script>
+  </body>
+</html>

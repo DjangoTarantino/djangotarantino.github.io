@@ -1,0 +1,43 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>Game of Life</title>
+<meta charset=UTF-8>
+<link rel="stylesheet" href="GameOfLife.css" type="text/css">
+</head>
+<body>
+
+<canvas id="myCanvas" style="position:absolute;top:200px;left:400px;">your browser does not support the canvas tag </canvas>
+
+<script type="text/javascript" src="GameOfLife.js"></script>
+
+<div id="title">
+	Game of Life
+</div>
+
+<div style="position:absolute;left:100px;top:225px;width:300px;height:300px;">
+	<div class ="text" style="left:0px;top:0px;">更迭速度：</div>
+	<input id  ="interval" class="s" type="text" name="interval" value="200" style="width:50px;left:120px;top:0px;">
+	<div class ="text" style="left:200px;top:0px;">毫秒/次</div>
+	
+	<div class ="text" style="left:0px;top:50px;">行细胞数：</div>
+	<input id  ="cellnum_inOneRow" class="s" type="text" name="cellnum_inOneRow" value="100" style="width:50px;left:120px;top:50px;">
+	<div class ="text" style="left:200px;top:50px;">个/行</div>
+	<div class ="text" style="left:0px;top:100px;">列细胞数：</div>
+	<input id  ="cellnum_inOneColume" class="s" type="text" name="cellnum_inOneColume" value="100" style="width:50px;left:120px;top:100px;">
+	<div class ="text" style="left:200px;top:100px;">个/列</div>
+
+	<div class ="text" style="left:0px;top:150px;">活细胞初始比例：</div>
+	<input id="percentage_livingcells" class="s" type="text" name="percentage_livingcells" value="20" style="width:50px;left:120px;top:150px;">
+	<div class ="text" style="left:200px;top:150px;">%</div>
+
+	<button id = "submit_initial" class="s" onclick="initial()"  style="width:150px;left:0px;top:250px;" >初始化/重新开始
+	<button id = "submit_interval" class="s" onclick="start_or_change_interval()" value="200" style="width:150px;left:0px;top:300px;" >开始/更改速度
+	<button id="pause" class="s" onclick="pause_interval()" style="width:150px;left:0px;top:350px;">暂停</button>
+	<button id="refresh" class="s" onclick="refresh_fate()" style="width:150px;left:0px;top:400px;">单次更替</button>
+
+</div>
+
+
+</body>
+</html>
